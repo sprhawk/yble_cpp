@@ -93,7 +93,7 @@ public:
     
     virtual void readCharacteristic(const CCharacteristic *characteristic);
     virtual void setCharacteristicNotifying(const CCharacteristic *characteristic, bool notifying);
-    virtual void writeCharacteristic(const CCharacteristic *characteristic, const void *data, uint32_t length);
+    virtual void writeCharacteristic(const CCharacteristic *characteristic, const void *data, uint32_t length, WriteType type);
     
     virtual vector<string> getAdvertisementKeys() const;
     virtual CAdvertisement* getAdvertisementByKey(const string& key) const;
@@ -389,11 +389,11 @@ void CPeripheralObjc::discoverServices(const vector<CService *> *services)
     }
     [m_peripheral discoverServices:servicesObjc
                         discovered:^(YBleService *service, NSError *error) {
-                            if (m_delegate) {
+                            if (this->getDelegate()) {
                                 CServiceObjc *srv = new CServiceObjc(service);
                                 string uuid = srv->getUUID();
                                 m_services[uuid] = srv;
-                                m_delegate->peripheralDidDiscoverService(this, srv);
+                                this->getDelegate()->peripheralDidDiscoverService(this, srv);
                             }
                         }];
 }
@@ -403,7 +403,12 @@ void CPeripheralObjc::readCharacteristic(const CCharacteristic *characteristic)
     const CCharacteristicObjc *c = dynamic_cast<const CCharacteristicObjc *>(characteristic);
     assert(c);
     const YBleCharacteristic * yc = c->getYbleCharacteristic();
-    [m_peripheral readCharacteristic:const_cast<YBleCharacteristic *>(yc)];
+    [m_peripheral readCharacteristic:const_cast<YBleCharacteristic *>(yc) callback:^(NSData *data, NSError *error) {
+        if (this->getDelegate()) {
+            const void *d = data.bytes;
+            this->getDelegate()->peripheralDidUpdateValue(this, c, d, data.length);
+        }
+    }];
 }
 
 void CPeripheralObjc::setCharacteristicNotifying(const CCharacteristic *characteristic, bool notifying)
@@ -415,21 +420,28 @@ void CPeripheralObjc::setCharacteristicNotifying(const CCharacteristic *characte
     [m_peripheral setCharacteristic:const_cast<YBleCharacteristic *>(yc)
                           notifying:notifying
                       stateCallback:^(BOOL notifying, NSError *error) {
-                          if (m_delegate) {
-                              m_delegate->peripheralDidUpdateNotificationState(this, characteristic, notifying);
+                          if (this->getDelegate()) {
+                              this->getDelegate()->peripheralDidUpdateNotificationState(this, characteristic, notifying);
                           }
                       }];
 }
 
-void CPeripheralObjc::writeCharacteristic(const CCharacteristic *characteristic, const void *data, uint32_t length)
+void CPeripheralObjc::writeCharacteristic(const CCharacteristic *characteristic, const void *data, uint32_t length, WriteType type)
 {
     const CCharacteristicObjc *c = dynamic_cast<const CCharacteristicObjc *>(characteristic);
     assert(c);
     assert(m_peripheral);
     assert(data);
     assert(length > 0);
-    void (^block)(NSData *data, NSError *error) = NULL;
     
+    void (^block)(NSData *data, NSError *error) = NULL;
+    if (WriteTypeWithResponse == type) {
+        block = ^(NSData *value, NSError *error) {
+            if (this->getDelegate()) {
+                this->getDelegate()->peripheralDidWriteValue(this, c, error?data:NULL, error?length:0);
+            }
+        };
+    }
     NSData *value = [NSData dataWithBytes:data length:length];
     const YBleCharacteristic * yc = c->getYbleCharacteristic();
     [m_peripheral writeCharacteristic:const_cast<YBleCharacteristic *>(yc)
@@ -449,6 +461,7 @@ CServiceObjc::CServiceObjc(YBleService *service)
 
 CServiceObjc::~CServiceObjc()
 {
+    
 }
 
 CCharacteristicObjc::CCharacteristicObjc(YBleCharacteristic *characteristic)

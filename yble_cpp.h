@@ -89,6 +89,11 @@ namespace Yble {
         PeripheralStateDisconnecting,
     }PeripheralState;
     
+    typedef enum WriteType {
+        WriteTypeWithoutResponse,
+        WriteTypeWithResponse,
+    }WriteType;
+    
     class CPeripheral {
     public:
 
@@ -111,7 +116,7 @@ namespace Yble {
         
         virtual void readCharacteristic(const CCharacteristic *characteristic) = 0;
         virtual void setCharacteristicNotifying(const CCharacteristic *characteristic, bool notifying) = 0;
-        virtual void writeCharacteristic(const CCharacteristic *characteristic, const void *data, uint32_t length)= 0;
+        virtual void writeCharacteristic(const CCharacteristic *characteristic, const void *data, uint32_t length, WriteType type)= 0;
         
         virtual map<string, CAdvertisement *> getAdvertisements() const = 0;
         virtual vector<string> getAdvertisementKeys() const = 0;
