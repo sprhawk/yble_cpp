@@ -192,9 +192,9 @@ CentralState CCentralObjc::cStateFromObjcState(YBleState state)
 
 void CCentralObjc::stateUpdate(YBleState state)
 {
-    if (m_delegate) {
+    if (this->getDelegate()) {
         CentralState s = CCentralObjc::cStateFromObjcState(state);
-        m_delegate->centralDidUpdateState(this, s);
+        this->getDelegate()->centralDidUpdateState(this, s);
     }
 }
 
@@ -229,8 +229,8 @@ void CCentralObjc::startScan(const vector<string> *services, unsigned int option
                           CPeripheralObjc *p = new CPeripheralObjc(peripheral);
                           string key = p->getIdentifier();
                           m_peripherals[key] = p;
-                          if (m_delegate) {
-                              m_delegate->centralDidDiscoverPeripheral(this, p);
+                          if (this->getDelegate()) {
+                              this->getDelegate()->centralDidDiscoverPeripheral(this, p);
                           }
                       }];
 }
@@ -323,8 +323,8 @@ void CPeripheralObjc::readRSSI()
     assert(m_peripheral);
     [m_peripheral readRssiCallback:^(NSNumber *rssi, NSError *error) {
         if (!error) {
-            if (m_delegate) {
-                m_delegate->peripheralDidUpdateRSSI(this, rssi.integerValue);
+            if (this->getDelegate()) {
+                this->getDelegate()->peripheralDidUpdateRSSI(this, rssi.integerValue);
             }
         }
     }];

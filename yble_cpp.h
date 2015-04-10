@@ -57,6 +57,7 @@ namespace Yble {
         
         virtual CentralState getState(void) const = 0;
         void setDelegate(const CCentralDelegate *delegate) { m_delegate = const_cast<CCentralDelegate *>(delegate); };
+        CCentralDelegate *getDelegate(void) const { return m_delegate; };
     protected:
         CCentralDelegate *m_delegate;
     };
@@ -106,7 +107,7 @@ namespace Yble {
         virtual string getIdentifier(void) const = 0;
         virtual string getName() const = 0;
         
-        void setDelegate(CPeripheralDelegate *delegate) { m_delegate = delegate; };
+        void setDelegate(const CPeripheralDelegate *delegate) { m_delegate = const_cast<CPeripheralDelegate *>(delegate); };
         CPeripheralDelegate *getDelegate(void) const { return m_delegate; };
         
         virtual void connect() = 0;
@@ -131,12 +132,12 @@ namespace Yble {
     
     class CPeripheralDelegate {
     public:
-        virtual void peripheralDidUpdateState(const CPeripheral *peripheral, PeripheralState state) = 0;
-        virtual void peripheralDidUpdateRSSI(const CPeripheral *peripheral ,int16_t rssi) = 0;
-        virtual void peripheralDidDiscoverService(const CPeripheral *peripheral, const CService *service) = 0;
-        virtual void peripheralDidUpdateValue(const CPeripheral *peripheral, const CCharacteristic *characteristic, const void *value, const size_t size) = 0;
-        virtual void peripheralDidWriteValue(const CPeripheral *peripheral, const CCharacteristic *characteristic, const void *value, const size_t size) = 0;
-        virtual void peripheralDidUpdateNotificationState(const CPeripheral *peripheral, const CCharacteristic *characteristic, const bool isNotifying) = 0;
+        virtual void peripheralDidUpdateState(const CPeripheral *peripheral, PeripheralState state) {};
+        virtual void peripheralDidUpdateRSSI(const CPeripheral *peripheral ,int16_t rssi) {};
+        virtual void peripheralDidDiscoverService(const CPeripheral *peripheral, const CService *service) {};
+        virtual void peripheralDidUpdateValue(const CPeripheral *peripheral, const CCharacteristic *characteristic, const void *value, const size_t size) {};
+        virtual void peripheralDidWriteValue(const CPeripheral *peripheral, const CCharacteristic *characteristic, const void *value, const size_t size) {};
+        virtual void peripheralDidUpdateNotificationState(const CPeripheral *peripheral, const CCharacteristic *characteristic, const bool isNotifying) {};
     };
     
     class CService
