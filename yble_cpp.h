@@ -52,6 +52,7 @@ namespace Yble {
         virtual ~CCentral();
         
         virtual bool isAvailable() const = 0;
+        virtual bool isScanning() const = 0;
         virtual void startScan(const vector<string> *services, unsigned int options) = 0;
         virtual void stopScan() = 0;
         

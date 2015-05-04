@@ -40,6 +40,7 @@ public:
 
 public:
     virtual bool isAvailable() const;
+    virtual bool isScanning() const;
     virtual void startScan(const vector<string> *services, unsigned int options);
     virtual void stopScan();
     
@@ -161,6 +162,11 @@ CCentralObjc::~CCentralObjc()
 bool CCentralObjc::isAvailable() const
 {
     return m_central.isAvailable;
+}
+
+bool CCentralObjc::isScanning() const
+{
+    return m_central.isScanning;
 }
 
 CentralState CCentralObjc::cStateFromObjcState(YBleState state)
