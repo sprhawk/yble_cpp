@@ -39,12 +39,12 @@ public:
     virtual ~CCentralObjc();
 
 public:
-    virtual bool isAvailable() const;
-    virtual bool isScanning() const;
+    virtual bool isAvailable();
+    virtual bool isScanning();
     virtual void startScan(const vector<string> *services, unsigned int options);
     virtual void stopScan();
     
-    virtual CentralState getState(void) const;
+    virtual CentralState getState(void);
     
 protected:
     virtual void stateUpdate(YBleState state);
@@ -159,12 +159,12 @@ CCentralObjc::~CCentralObjc()
     m_central = nil;
 }
 
-bool CCentralObjc::isAvailable() const
+bool CCentralObjc::isAvailable()
 {
     return m_central.isAvailable;
 }
 
-bool CCentralObjc::isScanning() const
+bool CCentralObjc::isScanning()
 {
     return m_central.isScanning;
 }
@@ -204,7 +204,7 @@ void CCentralObjc::stateUpdate(YBleState state)
     }
 }
 
-CentralState CCentralObjc::getState() const
+CentralState CCentralObjc::getState()
 {
     CentralState cstate = this->cStateFromObjcState(m_central.state);
     return cstate;

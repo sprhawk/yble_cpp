@@ -51,12 +51,12 @@ namespace Yble {
         CCentral(const CCentralDelegate *delegate);
         virtual ~CCentral();
         
-        virtual bool isAvailable() const = 0;
-        virtual bool isScanning() const = 0;
+        virtual bool isAvailable() = 0;
+        virtual bool isScanning() = 0;
         virtual void startScan(const vector<string> *services, unsigned int options) = 0;
         virtual void stopScan() = 0;
         
-        virtual CentralState getState(void) const = 0;
+        virtual CentralState getState(void) = 0;
         void setDelegate(const CCentralDelegate *delegate) { m_delegate = const_cast<CCentralDelegate *>(delegate); };
         CCentralDelegate *getDelegate(void) const { return m_delegate; };
     protected:
