@@ -41,6 +41,12 @@ project.xcworkspace
 
 #Android
 local.properties
+obj
+gen
+bin
+.settings
+.classpath
+.project
 
 # Tmp files
 \#*\#
